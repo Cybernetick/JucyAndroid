@@ -1,0 +1,27 @@
+//
+// Created by Ivan Khulup on 22.12.2023.
+//
+
+#ifndef SYNTHBRIDGE_SYNTHAUDIOSOURCE_H
+#define SYNTHBRIDGE_SYNTHAUDIOSOURCE_H
+
+#endif //SYNTHBRIDGE_SYNTHAUDIOSOURCE_H
+
+#include <juce_dsp/juce_dsp.h>
+#include <oboe/Oboe.h>
+
+using namespace juce;
+class SynthAudioSource {
+public:
+    SynthAudioSource(int sample_rate, int samples_per_block, int channel_count);
+
+    void startNote();
+    void stopNote();
+    oboe::Result renderNext(void* audioStream, int32_t frames_count);
+private:
+    dsp::Oscillator<float> oscillator {};
+    AudioBuffer<float> buffer {};
+    bool mIsNoteOn{false};
+    int mChannel_count = -1;
+
+};
