@@ -3,9 +3,10 @@
 //
 
 #include "SynthPlayer.h"
+#include "LogUtils.h"
 #include <android/log.h>
 
-SynthPlayer::SynthPlayer() {
+SynthPlayer::SynthPlayer(AAssetManager& assetManager) : mAudioSource(SampleAudioSource::newSourceFromAsset(assetManager, "kick_047_sloppy.wav")) {
 }
 
 void SynthPlayer::start() {
@@ -25,8 +26,6 @@ void SynthPlayer::start() {
     int samples_per_block = (mStream->getFramesPerBurst() * mStream->getBytesPerFrame()) /
                             mStream->getBytesPerSample();
 
-    mAudioSource = std::make_unique<SynthAudioSource>(sample_rate, samples_per_block,
-                                                      channel_count);
     LOGD("Synth Player", "stream build successful")
     mStream->setBufferSizeInFrames(mStream->getFramesPerBurst() * 2);
     oboe::Result streamStart = mStream->requestStart();
@@ -42,16 +41,12 @@ void SynthPlayer::stop() {
 }
 
 void SynthPlayer::playSound(bool isDown) {
-    if (isDown) {
-        mAudioSource->startNote();
-    } else {
-        mAudioSource->stopNote();
-    }
+    mAudioSource->playOneShotSound();
 }
 
 oboe::DataCallbackResult
 SynthPlayer::onAudioReady(oboe::AudioStream *audioStream, void *audioData, int32_t numFrames) {
     auto sample_count = (numFrames * audioStream->getBytesPerFrame()) / audioStream->getBytesPerSample();
-    mAudioSource->renderNext(audioData, sample_count);
+    mAudioSource->renderAudio(audioData, sample_count);
     return oboe::DataCallbackResult::Continue;
 }

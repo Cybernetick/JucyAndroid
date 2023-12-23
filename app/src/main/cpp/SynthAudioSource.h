@@ -7,17 +7,20 @@
 
 #endif //SYNTHBRIDGE_SYNTHAUDIOSOURCE_H
 
+#include "IAudioSource.h"
 #include <juce_dsp/juce_dsp.h>
 #include <oboe/Oboe.h>
 
 using namespace juce;
-class SynthAudioSource {
+class SynthAudioSource : public IAudioSource {
 public:
     SynthAudioSource(int sample_rate, int samples_per_block, int channel_count);
 
     void startNote();
     void stopNote();
-    oboe::Result renderNext(void* audioStream, int32_t frames_count);
+
+    oboe::Result renderAudio(void *outputBuffer, int32_t numFrames) override;
+
 private:
     dsp::Oscillator<float> oscillator {};
     AudioBuffer<float> buffer {};

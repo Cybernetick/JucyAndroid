@@ -25,7 +25,7 @@ void SynthAudioSource::stopNote() {
     mIsNoteOn = false;
 }
 
-oboe::Result SynthAudioSource::renderNext(void *audioStream, int32_t samples_count) {
+oboe::Result SynthAudioSource::renderAudio(void *audioStream, int32_t samples_count) {
     if (!mIsNoteOn)  {
         memset(audioStream, 0, sizeof(float) * samples_count);
     } else {
