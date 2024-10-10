@@ -13,9 +13,8 @@ SampleAudioSource::newSourceFromAsset(AAssetManager &assetManager, const char *a
         return nullptr;
     }
     off_t length = AAsset_getLength(asset);
-    LOGD("SampleAudioSource", "opened asset successfully")
 
-    float *buff = new float[length];
+    auto *buff = new float[length];
     AAsset_read(asset, buff, length);
 
     juce::AudioFormatManager formatManager{};
@@ -23,22 +22,29 @@ SampleAudioSource::newSourceFromAsset(AAssetManager &assetManager, const char *a
     auto reader = formatManager.createReaderFor(
             std::make_unique<juce::MemoryInputStream>(buff, length, false));
 
-    juce::AudioBuffer<float> buffer{};
+    juce::AudioBuffer<float> buffer;
     buffer.setSize(reader->numChannels, reader->lengthInSamples);
     buffer.clear();
     reader->read(&buffer, 0, reader->lengthInSamples, 0, true, true);
+    delete[] buff;
 
-    return new SampleAudioSource(std::move(buffer));
+    return new SampleAudioSource(buffer);
 }
 
-oboe::Result SampleAudioSource::renderAudio(void *outputBuffer, int32_t numFrames) {
+oboe::Result SampleAudioSource::renderAudio(void *outputBuffer, uint8_t output_channels_count, int32_t num_frames) {
     if (!playSound) {
-        memset(outputBuffer, 0, sizeof(float) * numFrames);
+        memset(outputBuffer, 0, sizeof(float) * num_frames);
     } else {
         auto output = static_cast<float *>(outputBuffer);
-        for (int i = 0; i < numFrames; ++i) {
+        auto num_channels = mBuffer.getNumChannels();
+        for (int i = 0; i < num_frames ; ++i) {
             if (i + cursor < mBuffer.getNumSamples()) {
-                output[i] = mBuffer.getSample(0, i + cursor);
+                if (output_channels_count == 2 && num_channels == 2) {
+                    output[i] = mBuffer.getSample(0, i + cursor);
+                    output[i + 1] = mBuffer.getSample(1, i + cursor);
+                } else {
+                    output[i] = mBuffer.getSample(0, i + cursor);
+                }
             } else {
                 break;
             }
@@ -47,7 +53,7 @@ oboe::Result SampleAudioSource::renderAudio(void *outputBuffer, int32_t numFrame
             cursor = 0;
             playSound = false;
         } else {
-            cursor += numFrames;
+            cursor += num_frames;
         }
     }
 

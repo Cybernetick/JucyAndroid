@@ -16,12 +16,14 @@ class SampleAudioSource : public IAudioSource{
 public:
     static SampleAudioSource* newSourceFromAsset(AAssetManager& assetManager, const char* assetName);
 
-    oboe::Result renderAudio(void *outputBuffer, int32_t numFrames) override;
+    oboe::Result
+    renderAudio(void *outputBuffer, uint8_t output_channels_count, int32_t num_frames) override;
+
     void playOneShotSound();
 
 private:
-    explicit SampleAudioSource(const juce::AudioBuffer<float> &mBuffer) : mBuffer(mBuffer) {}
-    const juce::AudioBuffer<float> mBuffer {};
+    explicit SampleAudioSource(juce::AudioBuffer<float> &mBuffer) : mBuffer(mBuffer) {}
+    juce::AudioBuffer<float> mBuffer {};
     bool playSound { false };
     int cursor = 0;
 };

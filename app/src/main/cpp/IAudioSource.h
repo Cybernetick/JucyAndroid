@@ -10,5 +10,5 @@
 #include <oboe/Oboe.h>
 class IAudioSource {
 public:
-    virtual oboe::Result renderAudio(void* outputBuffer, int32_t numFrames) = 0;
+    virtual oboe::Result renderAudio(void* outputBuffer, uint8_t channels_count, int32_t num_frames) = 0;
 };

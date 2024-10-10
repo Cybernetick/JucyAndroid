@@ -19,7 +19,8 @@ public:
     void startNote();
     void stopNote();
 
-    oboe::Result renderAudio(void *outputBuffer, int32_t numFrames) override;
+    oboe::Result
+    renderAudio(void *outputBuffer, uint8_t channels_count, int32_t numFrames) override;
 
 private:
     dsp::Oscillator<float> oscillator {};

@@ -11,7 +11,7 @@
 #include <juce_dsp/juce_dsp.h>
 #include "SampleAudioSource.h"
 
-class SynthPlayer: public oboe::AudioStreamDataCallback{
+class SynthPlayer: public oboe::AudioStreamDataCallback {
 private:
     oboe::AudioStreamBuilder builder;
     std::shared_ptr<oboe::AudioStream> mStream;

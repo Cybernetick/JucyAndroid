@@ -25,11 +25,11 @@ void SynthAudioSource::stopNote() {
     mIsNoteOn = false;
 }
 
-oboe::Result SynthAudioSource::renderAudio(void *audioStream, int32_t samples_count) {
+oboe::Result SynthAudioSource::renderAudio(void *audioStream, uint8_t channels_count, int32_t samples_count) {
     if (!mIsNoteOn)  {
         memset(audioStream, 0, sizeof(float) * samples_count);
     } else {
-        buffer.setSize(mChannel_count, samples_count);
+        buffer.setSize(channels_count, samples_count);
         buffer.clear();
         auto output = static_cast<float *>(audioStream);
         auto block = juce::dsp::AudioBlock<float> { buffer };

@@ -12,21 +12,18 @@ SynthPlayer::SynthPlayer(AAssetManager& assetManager) : mAudioSource(SampleAudio
 void SynthPlayer::start() {
     oboe::Result result = builder.setSharingMode(oboe::SharingMode::Exclusive)
             ->setPerformanceMode(oboe::PerformanceMode::LowLatency)
+            ->setSampleRateConversionQuality(oboe::SampleRateConversionQuality::Best)
             ->setFormat(oboe::AudioFormat::Float)
             ->setFormatConversionAllowed(true)
             ->setDataCallback(this)
             ->setChannelCount(1)
+            ->setSampleRate(44100)
             ->openStream(mStream);
 
     if (result != oboe::Result::OK) {
         LOGE("Synth Player", "Synth player initialization failed with result code: ");
     }
-    int channel_count = mStream->getChannelCount();
-    int sample_rate = mStream->getSampleRate();
-    int samples_per_block = (mStream->getFramesPerBurst() * mStream->getBytesPerFrame()) /
-                            mStream->getBytesPerSample();
 
-    LOGD("Synth Player", "stream build successful")
     mStream->setBufferSizeInFrames(mStream->getFramesPerBurst() * 2);
     oboe::Result streamStart = mStream->requestStart();
     if (streamStart != oboe::Result::OK) {
@@ -46,7 +43,6 @@ void SynthPlayer::playSound(bool isDown) {
 
 oboe::DataCallbackResult
 SynthPlayer::onAudioReady(oboe::AudioStream *audioStream, void *audioData, int32_t numFrames) {
-    auto sample_count = (numFrames * audioStream->getBytesPerFrame()) / audioStream->getBytesPerSample();
-    mAudioSource->renderAudio(audioData, sample_count);
+    mAudioSource->renderAudio(audioData, audioStream->getChannelCount(), numFrames);
     return oboe::DataCallbackResult::Continue;
 }
