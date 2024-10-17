@@ -31,13 +31,14 @@ SampleAudioSource::newSourceFromAsset(AAssetManager &assetManager, const char *a
     return new SampleAudioSource(buffer);
 }
 
-oboe::Result SampleAudioSource::renderAudio(void *outputBuffer, uint8_t output_channels_count, int32_t num_frames) {
+oboe::Result SampleAudioSource::renderAudio(void *outputBuffer, uint8_t output_channels_count,
+                                            int32_t num_frames) {
     if (!playSound) {
         memset(outputBuffer, 0, sizeof(float) * num_frames);
     } else {
         auto output = static_cast<float *>(outputBuffer);
         auto num_channels = mBuffer.getNumChannels();
-        for (int i = 0; i < num_frames ; ++i) {
+        for (int i = 0; i < num_frames; ++i) {
             if (i + cursor < mBuffer.getNumSamples()) {
                 if (output_channels_count == 2 && num_channels == 2) {
                     output[i] = mBuffer.getSample(0, i + cursor);
